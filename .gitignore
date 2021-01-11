@@ -1,0 +1,14 @@
+# macOS
+.DS_Store
+
+# editor
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# etc
+quote
+quote.exe
