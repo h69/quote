@@ -541,3 +541,72 @@ func GetStockFollow() []Stock {
 
 	return stocks
 }
+
+// GetStockMao20 获取股票茅20组合
+func GetStockMao20() []Stock {
+	var stocks []Stock
+
+	codes := []string{
+		"sh600036",
+		"sz300015",
+		"sz300760",
+		"sz002714",
+		"sh603288",
+		"sz000858",
+		"sz300059",
+		"sh600519",
+		"sh601318",
+		"sh600900",
+		"sh603259",
+		"sz300750",
+		"sh600031",
+		"sh600309",
+		"sh600276",
+		"sz000333",
+		"sh600887",
+		"sz002352",
+		"sz002475",
+		"sh601888",
+	}
+
+	for _, code := range codes {
+		body, err := Get("https://x-quote.cls.cn/quote/stock/basic?secu_code=" + code + "&fields=secu_name,secu_code,last_px,change&app=CailianpressWeb")
+		if err != nil {
+			panic(err)
+		}
+
+		log.Println(body)
+
+		type Resp struct {
+			Data struct {
+				SecuName string  `json:"secu_name"`
+				SecuCode string  `json:"secu_code"`
+				LastPx   float64 `json:"last_px"`
+				Change   float64 `json:"change"`
+			} `json:"data"`
+		}
+
+		var resp Resp
+		err = json.Unmarshal([]byte(body), &resp)
+		if err != nil {
+			panic(err)
+		}
+
+		var flag string
+		if resp.Data.Change > 0 {
+			flag = "+"
+		}
+
+		stocks = append(stocks, Stock{
+			Name:    resp.Data.SecuName,
+			Code:    strings.ToUpper(resp.Data.SecuCode),
+			Value:   "",
+			Current: fmt.Sprintf("%.2f", resp.Data.LastPx),
+			Percent: flag + fmt.Sprintf("%.2f", resp.Data.Change*100) + "%",
+		})
+	}
+
+	log.Println(Sprintf(stocks))
+
+	return stocks
+}

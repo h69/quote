@@ -48,6 +48,9 @@ func GenerateArticle() Article {
 	article.Content += RenderSubtitle("日涨幅榜")
 	article.Content += RenderStockTable(GetStockPercent())
 	article.Content += RenderPlaceholder()
+	article.Content += RenderSubtitle("招财大牛猫茅 20 组合")
+	article.Content += RenderStockTable(GetStockMao20())
+	article.Content += RenderPlaceholder()
 	article.Content += RenderFooter()
 
 	log.Println(article.Content)
