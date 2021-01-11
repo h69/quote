@@ -51,6 +51,9 @@ func GenerateArticle() Article {
 	article.Content += RenderSubtitle("招财大牛猫茅 20 组合")
 	article.Content += RenderStockTable(GetStockMao20())
 	article.Content += RenderPlaceholder()
+	article.Content += RenderSubtitle("市场复盘")
+	article.Content += RenderStockEvent(GetStockEvents())
+	article.Content += RenderPlaceholder()
 	article.Content += RenderFooter()
 
 	log.Println(article.Content)

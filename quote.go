@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"strings"
+	"unicode/utf8"
 )
 
 // Bar 股票分布
@@ -22,6 +23,12 @@ type Stock struct {
 	Value   string
 	Current string
 	Percent string
+}
+
+// Event 事件
+type Event struct {
+	Content string
+	Time    string
 }
 
 // GetStockCloseTime 获取股票休市时间
@@ -609,4 +616,46 @@ func GetStockMao20() []Stock {
 	log.Println(Sprintf(stocks))
 
 	return stocks
+}
+
+// GetStockEvents 获取股票事件
+func GetStockEvents() []Event {
+	var events []Event
+
+	body, err := Get("https://api.wallstcn.com/apiv1/search/live?channel=a-stock-channel&limit=100&score=2")
+	if err != nil {
+		panic(err)
+	}
+
+	log.Println(body)
+
+	type Resp struct {
+		Data struct {
+			Items []struct {
+				ContentText string `json:"content_text"`
+				DisplayTime int64  `json:"display_time"`
+			} `json:"items"`
+		} `json:"data"`
+	}
+
+	var resp Resp
+	err = json.Unmarshal([]byte(body), &resp)
+	if err != nil {
+		panic(err)
+	}
+
+	closeTime := GetStockCloseTime()
+
+	for _, event := range resp.Data.Items {
+		if event.DisplayTime >= GetTimestamp(closeTime+" 09:00:00") && event.DisplayTime <= GetTimestamp(closeTime+" 15:00:00") && utf8.RuneCountInString(event.ContentText) <= 100 {
+			events = append(events, Event{
+				Content: strings.ReplaceAll(event.ContentText, "\n", ""),
+				Time:    GetHourMinute(event.DisplayTime),
+			})
+		}
+	}
+
+	log.Println(Sprintf(events))
+
+	return events
 }

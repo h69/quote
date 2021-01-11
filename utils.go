@@ -133,6 +133,17 @@ func GetDate(days int) string {
 	return time.Now().AddDate(0, 0, days).Format("2006/01/02")
 }
 
+// GetTimestamp 获取时间戳
+func GetTimestamp(datetime string) int64 {
+	t, _ := time.ParseInLocation("2006/01/02 15:04:05", datetime, time.Local)
+	return t.Unix()
+}
+
+// GetHourMinute 获取小时分钟
+func GetHourMinute(timestamp int64) string {
+	return time.Unix(timestamp, 0).Format("15:04")
+}
+
 // Sprintf 格式化对象结构
 func Sprintf(v interface{}) string {
 	b, err := json.Marshal(v)

@@ -89,3 +89,16 @@ func RenderStockChart(bars []Bar) string {
 
 	return html
 }
+
+// RenderStockEvent 股票事件
+func RenderStockEvent(events []Event) string {
+	html := `<table style="width: 100%; padding-right: 16px; padding-left: 16px; border: 0px; line-height: 0;"><tbody>`
+	for i := 0; i < len(events); i++ {
+		html += `<tr style="border: 0px;">`
+		html += `<td valign="top" style="width: 70px; border: 0px; border-bottom: 0px dashed #ccc; padding-top: 10px; padding-bottom: 10px;"><span style="font-size: 15px; letter-spacing: 0.5px; line-height: 1.75em;"><strong>` + events[i].Time + `</strong></span></td>`
+		html += `<td valign="top" style="border: 0px; border-bottom: 0px dashed #ccc; padding-top: 10px; padding-bottom: 10px;"><span style="font-size: 15px; letter-spacing: 0.5px; line-height: 1.75em;">` + events[i].Content + `</span></td>`
+		html += `</tr>`
+	}
+	html += `</tbody></table>`
+	return html
+}
