@@ -23,6 +23,12 @@ func main() {
 
 	c := cron.New()
 	c.AddFunc("0 10 15 * * ?", func() {
+		defer func() {
+			if err := recover(); err != nil {
+				log.Println(err)
+			}
+		}()
+
 		if GetStockCloseTime() == GetDate(0) {
 			article := GenerateArticle()
 			AddNews(article.Title, article.Digest, article.Content, article.Cover)
