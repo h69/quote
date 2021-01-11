@@ -20,6 +20,8 @@ func GenerateArticle() Article {
 	article.Digest = "A 股行情报告。"
 	article.Cover = cover
 
+	article.Content += RenderHeader()
+	article.Content += RenderPlaceholder()
 	article.Content += RenderStockChart(GetStockMarketOverview())
 	article.Content += RenderPlaceholder()
 	article.Content += RenderSubtitle("大盘指数")
@@ -46,6 +48,7 @@ func GenerateArticle() Article {
 	article.Content += RenderSubtitle("日涨幅榜")
 	article.Content += RenderStockTable(GetStockPercent())
 	article.Content += RenderPlaceholder()
+	article.Content += RenderFooter()
 
 	log.Println(article.Content)
 

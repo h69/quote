@@ -5,6 +5,16 @@ import (
 	"strings"
 )
 
+// RenderHeader 页头
+func RenderHeader() string {
+	return `<p style="white-space: normal; "><span style="font-size: 15px; color: rgb(255, 255, 255); background-color: rgb(72, 91, 247); padding: 5px;"><strong>👆点击关注，掌握一手行情</strong></span></p>`
+}
+
+// RenderFooter 页尾
+func RenderFooter() string {
+	return `<p style="white-space: normal; text-align: right;"><span style="font-size: 15px; color: rgb(255, 255, 255); background-color: rgb(72, 91, 247); padding: 5px;"><strong>「分享」「点赞」「在看」涨涨涨 👇</strong></span></p>`
+}
+
 // RenderTitle 主标题
 func RenderTitle(title string) string {
 	return `<p style="text-align: center; padding-right: 16px; padding-left: 16px; margin-bottom: 10px;"><span style="color: rgb(72, 91, 247); font-size: 24px; letter-spacing: 0.5px; line-height: 1.75em;"><strong>` + title + `</strong></span></p>`
