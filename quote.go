@@ -18,11 +18,12 @@ type Bar struct {
 
 // Stock 股票
 type Stock struct {
-	Name    string
-	Code    string
-	Value   string
-	Current string
-	Percent string
+	Name               string
+	Code               string
+	Current            string
+	Percent            string
+	CurrentYearPercent string
+	Value              string
 }
 
 // Event 事件
@@ -185,17 +186,12 @@ func GetStockMarketIndex() []Stock {
 	}
 
 	for _, stock := range resp.Data.IndexQuote {
-		var flag string
-		if stock.Change > 0 {
-			flag = "+"
-		}
-
 		stocks = append(stocks, Stock{
 			Name:    stock.SecuName,
 			Code:    strings.ToUpper(stock.SecuCode),
-			Value:   "",
 			Current: fmt.Sprintf("%.2f", stock.LastPx),
-			Percent: flag + fmt.Sprintf("%.2f", stock.Change*100) + "%",
+			Percent: GetPercentSign(stock.Change) + fmt.Sprintf("%.2f", stock.Change*100) + "%",
+			Value:   "",
 		})
 	}
 
@@ -218,11 +214,12 @@ func GetStockMarketCapital() []Stock {
 	type Resp struct {
 		Data struct {
 			List []struct {
-				Name          string  `json:"name"`
-				Symbol        string  `json:"symbol"`
-				Current       float64 `json:"current"`
-				Percent       float64 `json:"percent"`
-				MarketCapital float64 `json:"market_capital"`
+				Name               string  `json:"name"`
+				Symbol             string  `json:"symbol"`
+				Current            float64 `json:"current"`
+				Percent            float64 `json:"percent"`
+				CurrentYearPercent float64 `json:"current_year_percent"`
+				MarketCapital      float64 `json:"market_capital"`
 			} `json:"list"`
 		} `json:"data"`
 	}
@@ -234,17 +231,13 @@ func GetStockMarketCapital() []Stock {
 	}
 
 	for _, stock := range resp.Data.List {
-		var flag string
-		if stock.Percent > 0 {
-			flag = "+"
-		}
-
 		stocks = append(stocks, Stock{
-			Name:    stock.Name,
-			Code:    stock.Symbol,
-			Value:   fmt.Sprintf("%.2f", stock.MarketCapital/100000000/10000) + " 万亿",
-			Current: fmt.Sprintf("%.2f", stock.Current),
-			Percent: flag + fmt.Sprintf("%.2f", stock.Percent) + "%",
+			Name:               stock.Name,
+			Code:               stock.Symbol,
+			Current:            fmt.Sprintf("%.2f", stock.Current),
+			Percent:            GetPercentSign(stock.Percent) + fmt.Sprintf("%.2f", stock.Percent) + "%",
+			CurrentYearPercent: GetPercentSign(stock.CurrentYearPercent) + fmt.Sprintf("%.2f", stock.CurrentYearPercent) + "%",
+			Value:              fmt.Sprintf("%.2f", stock.MarketCapital/100000000/10000),
 		})
 	}
 
@@ -267,10 +260,11 @@ func GetStockCurrent() []Stock {
 	type Resp struct {
 		Data struct {
 			List []struct {
-				Name    string  `json:"name"`
-				Symbol  string  `json:"symbol"`
-				Percent float64 `json:"percent"`
-				Current float64 `json:"current"`
+				Name               string  `json:"name"`
+				Symbol             string  `json:"symbol"`
+				Current            float64 `json:"current"`
+				Percent            float64 `json:"percent"`
+				CurrentYearPercent float64 `json:"current_year_percent"`
 			} `json:"list"`
 		} `json:"data"`
 	}
@@ -282,17 +276,13 @@ func GetStockCurrent() []Stock {
 	}
 
 	for _, stock := range resp.Data.List {
-		var flag string
-		if stock.Percent > 0 {
-			flag = "+"
-		}
-
 		stocks = append(stocks, Stock{
-			Name:    stock.Name,
-			Code:    stock.Symbol,
-			Value:   "",
-			Current: fmt.Sprintf("%.2f", stock.Current),
-			Percent: flag + fmt.Sprintf("%.2f", stock.Percent) + "%",
+			Name:               stock.Name,
+			Code:               stock.Symbol,
+			Current:            fmt.Sprintf("%.2f", stock.Current),
+			Percent:            GetPercentSign(stock.Percent) + fmt.Sprintf("%.2f", stock.Percent) + "%",
+			CurrentYearPercent: GetPercentSign(stock.CurrentYearPercent) + fmt.Sprintf("%.2f", stock.CurrentYearPercent) + "%",
+			Value:              "",
 		})
 	}
 
@@ -315,11 +305,12 @@ func GetStockVolume() []Stock {
 	type Resp struct {
 		Data struct {
 			List []struct {
-				Name    string  `json:"name"`
-				Symbol  string  `json:"symbol"`
-				Current float64 `json:"current"`
-				Percent float64 `json:"percent"`
-				Volume  float64 `json:"volume"`
+				Name               string  `json:"name"`
+				Symbol             string  `json:"symbol"`
+				Current            float64 `json:"current"`
+				Percent            float64 `json:"percent"`
+				CurrentYearPercent float64 `json:"current_year_percent"`
+				Volume             float64 `json:"volume"`
 			} `json:"list"`
 		} `json:"data"`
 	}
@@ -331,17 +322,13 @@ func GetStockVolume() []Stock {
 	}
 
 	for _, stock := range resp.Data.List {
-		var flag string
-		if stock.Percent > 0 {
-			flag = "+"
-		}
-
 		stocks = append(stocks, Stock{
-			Name:    stock.Name,
-			Code:    stock.Symbol,
-			Value:   fmt.Sprintf("%.2f", stock.Volume/100000000) + " 亿",
-			Current: fmt.Sprintf("%.2f", stock.Current),
-			Percent: flag + fmt.Sprintf("%.2f", stock.Percent) + "%",
+			Name:               stock.Name,
+			Code:               stock.Symbol,
+			Current:            fmt.Sprintf("%.2f", stock.Current),
+			Percent:            GetPercentSign(stock.Percent) + fmt.Sprintf("%.2f", stock.Percent) + "%",
+			CurrentYearPercent: GetPercentSign(stock.CurrentYearPercent) + fmt.Sprintf("%.2f", stock.CurrentYearPercent) + "%",
+			Value:              fmt.Sprintf("%.2f", stock.Volume/100000000),
 		})
 	}
 
@@ -364,11 +351,12 @@ func GetStockAmount() []Stock {
 	type Resp struct {
 		Data struct {
 			List []struct {
-				Name    string  `json:"name"`
-				Symbol  string  `json:"symbol"`
-				Current float64 `json:"current"`
-				Percent float64 `json:"percent"`
-				Amount  float64 `json:"amount"`
+				Name               string  `json:"name"`
+				Symbol             string  `json:"symbol"`
+				Current            float64 `json:"current"`
+				Percent            float64 `json:"percent"`
+				CurrentYearPercent float64 `json:"current_year_percent"`
+				Amount             float64 `json:"amount"`
 			} `json:"list"`
 		} `json:"data"`
 	}
@@ -380,17 +368,13 @@ func GetStockAmount() []Stock {
 	}
 
 	for _, stock := range resp.Data.List {
-		var flag string
-		if stock.Percent > 0 {
-			flag = "+"
-		}
-
 		stocks = append(stocks, Stock{
-			Name:    stock.Name,
-			Code:    stock.Symbol,
-			Value:   fmt.Sprintf("%.2f", stock.Amount/100000000) + " 亿",
-			Current: fmt.Sprintf("%.2f", stock.Current),
-			Percent: flag + fmt.Sprintf("%.2f", stock.Percent) + "%",
+			Name:               stock.Name,
+			Code:               stock.Symbol,
+			Current:            fmt.Sprintf("%.2f", stock.Current),
+			Percent:            GetPercentSign(stock.Percent) + fmt.Sprintf("%.2f", stock.Percent) + "%",
+			CurrentYearPercent: GetPercentSign(stock.CurrentYearPercent) + fmt.Sprintf("%.2f", stock.CurrentYearPercent) + "%",
+			Value:              fmt.Sprintf("%.2f", stock.Amount/100000000),
 		})
 	}
 
@@ -429,22 +413,13 @@ func GetStockCurrentYearPercent() []Stock {
 	}
 
 	for _, stock := range resp.Data.List {
-		var flag string
-		if stock.Percent > 0 {
-			flag = "+"
-		}
-
-		var flag2 string
-		if stock.CurrentYearPercent > 0 {
-			flag2 = "+"
-		}
-
 		stocks = append(stocks, Stock{
-			Name:    stock.Name,
-			Code:    stock.Symbol,
-			Value:   flag2 + fmt.Sprintf("%.2f", stock.CurrentYearPercent) + "%",
-			Current: fmt.Sprintf("%.2f", stock.Current),
-			Percent: flag + fmt.Sprintf("%.2f", stock.Percent) + "%",
+			Name:               stock.Name,
+			Code:               stock.Symbol,
+			Current:            fmt.Sprintf("%.2f", stock.Current),
+			Percent:            GetPercentSign(stock.Percent) + fmt.Sprintf("%.2f", stock.Percent) + "%",
+			CurrentYearPercent: GetPercentSign(stock.CurrentYearPercent) + fmt.Sprintf("%.2f", stock.CurrentYearPercent) + "%",
+			Value:              "",
 		})
 	}
 
@@ -467,10 +442,11 @@ func GetStockPercent() []Stock {
 	type Resp struct {
 		Data struct {
 			List []struct {
-				Name    string  `json:"name"`
-				Symbol  string  `json:"symbol"`
-				Current float64 `json:"current"`
-				Percent float64 `json:"percent"`
+				Name               string  `json:"name"`
+				Symbol             string  `json:"symbol"`
+				Current            float64 `json:"current"`
+				Percent            float64 `json:"percent"`
+				CurrentYearPercent float64 `json:"current_year_percent"`
 			} `json:"list"`
 		} `json:"data"`
 	}
@@ -482,17 +458,13 @@ func GetStockPercent() []Stock {
 	}
 
 	for _, stock := range resp.Data.List {
-		var flag string
-		if stock.Percent > 0 {
-			flag = "+"
-		}
-
 		stocks = append(stocks, Stock{
-			Name:    stock.Name,
-			Code:    stock.Symbol,
-			Value:   "",
-			Current: fmt.Sprintf("%.2f", stock.Current),
-			Percent: flag + fmt.Sprintf("%.2f", stock.Percent) + "%",
+			Name:               stock.Name,
+			Code:               stock.Symbol,
+			Current:            fmt.Sprintf("%.2f", stock.Current),
+			Percent:            GetPercentSign(stock.Percent) + fmt.Sprintf("%.2f", stock.Percent) + "%",
+			CurrentYearPercent: GetPercentSign(stock.CurrentYearPercent) + fmt.Sprintf("%.2f", stock.CurrentYearPercent) + "%",
+			Value:              "",
 		})
 	}
 
@@ -530,17 +502,12 @@ func GetStockFollow() []Stock {
 	}
 
 	for _, stock := range resp.Data.List {
-		var flag string
-		if stock.Pct > 0 {
-			flag = "+"
-		}
-
 		stocks = append(stocks, Stock{
 			Name:    stock.Name,
 			Code:    stock.Symbol,
-			Value:   "",
 			Current: fmt.Sprintf("%.2f", stock.Current),
-			Percent: flag + fmt.Sprintf("%.2f", stock.Pct) + "%",
+			Percent: GetPercentSign(stock.Pct) + fmt.Sprintf("%.2f", stock.Pct) + "%",
+			Value:   "",
 		})
 	}
 
@@ -599,17 +566,12 @@ func GetStockMao20() []Stock {
 			panic(err)
 		}
 
-		var flag string
-		if resp.Data.Change > 0 {
-			flag = "+"
-		}
-
 		stocks = append(stocks, Stock{
 			Name:    resp.Data.SecuName,
 			Code:    strings.ToUpper(resp.Data.SecuCode),
-			Value:   "",
 			Current: fmt.Sprintf("%.2f", resp.Data.LastPx),
-			Percent: flag + fmt.Sprintf("%.2f", resp.Data.Change*100) + "%",
+			Percent: GetPercentSign(resp.Data.Change) + fmt.Sprintf("%.2f", resp.Data.Change*100) + "%",
+			Value:   "",
 		})
 	}
 

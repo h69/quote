@@ -6,13 +6,13 @@ import (
 )
 
 // RenderHeader 页头
-func RenderHeader() string {
-	return `<p style="white-space: normal; "><span style="font-size: 15px; color: rgb(255, 255, 255); background-color: rgb(72, 91, 247); padding: 5px;"><strong>👆点击关注，掌握一手行情</strong></span></p>`
+func RenderHeader(header string) string {
+	return `<p style="white-space: normal; "><span style="font-size: 15px; color: rgb(255, 255, 255); background-color: rgb(72, 91, 247); padding: 5px;"><strong>` + header + `</strong></span></p>`
 }
 
 // RenderFooter 页尾
-func RenderFooter() string {
-	return `<p style="white-space: normal; text-align: right;"><span style="font-size: 15px; color: rgb(255, 255, 255); background-color: rgb(72, 91, 247); padding: 5px;"><strong>「分享」「点赞」「在看」涨涨涨 👇</strong></span></p>`
+func RenderFooter(footer string) string {
+	return `<p style="white-space: normal; text-align: right;"><span style="font-size: 15px; color: rgb(255, 255, 255); background-color: rgb(72, 91, 247); padding: 5px;"><strong>` + footer + `</strong></span></p>`
 }
 
 // RenderTitle 主标题
@@ -34,19 +34,28 @@ func RenderPlaceholder() string {
 func RenderStockTable(stocks []Stock) string {
 	html := `<table style="width: 100%; padding-right: 16px; padding-left: 16px; border: 0px; line-height: 0;"><tbody>`
 	for i := 0; i < len(stocks); i++ {
-		var color string
+		var percentColor string
 		if stocks[i].Percent == "0.00%" {
-			color = "color: rgb(153, 153, 153);"
+			percentColor = "color: rgb(153, 153, 153);"
 		} else if strings.Contains(stocks[i].Percent, "+") {
-			color = "color: rgb(246, 66, 69);"
+			percentColor = "color: rgb(246, 66, 69);"
 		} else {
-			color = "color: rgb(0, 171, 59);"
+			percentColor = "color: rgb(0, 171, 59);"
+		}
+
+		var currentYearPercentColor string
+		if stocks[i].CurrentYearPercent == "0.00%" {
+			currentYearPercentColor = "color: rgb(153, 153, 153);"
+		} else if strings.Contains(stocks[i].CurrentYearPercent, "+") {
+			currentYearPercentColor = "color: rgb(246, 66, 69);"
+		} else {
+			currentYearPercentColor = "color: rgb(0, 171, 59);"
 		}
 
 		html += `<tr style="border: 0px;">`
-		html += `<td style="width: 33.33%; border: 0px; border-bottom: 0px dashed #ccc; padding-top: 10px; padding-bottom: 10px;"><span style="font-size: 15px; letter-spacing: 0.5px; line-height: 1.25em;">` + stocks[i].Name + `</span><br/><span style="font-size: 12px; letter-spacing: 0.5px; line-height: 1.25em; color: #888;">` + stocks[i].Code + `</span></td>`
-		html += `<td style="width: 33.33%; border: 0px; border-bottom: 0px dashed #ccc; padding-top: 10px; padding-bottom: 10px; text-align: right;"><span style="font-size: 15px; letter-spacing: 0.5px; line-height: 1.75em;">` + stocks[i].Value + `</span></td>`
-		html += `<td style="width: 33.33%; border: 0px; border-bottom: 0px dashed #ccc; padding-top: 10px; padding-bottom: 10px; text-align: right;"><span style="font-size: 15px; letter-spacing: 0.5px; line-height: 1.25em; ` + color + `">` + stocks[i].Current + `</span><br/><span style="font-size: 12px; letter-spacing: 0.5px; line-height: 1.25em; ` + color + `">` + stocks[i].Percent + `</span></td>`
+		html += `<td style="width: 30%; border: 0px; border-bottom: 0px dashed #ccc; padding-top: 10px; padding-bottom: 10px;"><span style="font-size: 15px; letter-spacing: 0.5px; line-height: 1.25em;">` + stocks[i].Name + `</span><br/><span style="font-size: 12px; letter-spacing: 0.5px; line-height: 1.25em; color: #888;">` + stocks[i].Code + `</span></td>`
+		html += `<td style="width: 25%; border: 0px; border-bottom: 0px dashed #ccc; padding-top: 10px; padding-bottom: 10px; text-align: right;"><span style="font-size: 15px; letter-spacing: 0.5px; line-height: 1.75em;">` + stocks[i].Value + `</span></td>`
+		html += `<td style="width: 45%; border: 0px; border-bottom: 0px dashed #ccc; padding-top: 10px; padding-bottom: 10px; text-align: right;"><span style="font-size: 15px; letter-spacing: 0.5px; line-height: 1.25em; ` + percentColor + `">` + stocks[i].Current + `</span><span style="font-size: 15px; letter-spacing: 0.5px; line-height: 1.25em; ` + percentColor + `"> ` + stocks[i].Percent + `</span><br/><span style="font-size: 12px; letter-spacing: 0.5px; line-height: 1.25em; ` + currentYearPercentColor + `">` + stocks[i].CurrentYearPercent + `</span></td>`
 		html += `</tr>`
 	}
 	html += `</tbody></table>`
@@ -81,10 +90,10 @@ func RenderStockChart(bars []Bar) string {
 
 	html += `<table style="width: 100%; padding-right: 16px; padding-left: 16px; border: 0px; line-height: 0;"><tbody>`
 	html += `<tr style="border: 0px;">`
-	html += `<td valign="top" style="width: ` + fmt.Sprintf("%.2f", down/(down+flat+up)*90) + `%-20px; border: 0px; text-align: center; padding-left: 0px; padding-right: 0px;"><span style="display: inline-block; border-radius: 5px 0 0 5px; width: 100%; height: 5px; background-color: rgb(0, 171, 59);"></span><br/><span style="font-size: 12px; letter-spacing: 0.5px; line-height: 1.75em; color: rgb(0, 171, 59);">` + Float64ToString(down) + `</span></td>`
-	html += `<td valign="top" style="width: ` + fmt.Sprintf("%.2f", flat/(down+flat+up)*90) + `%; border: 0px; text-align: center; padding-left: 0px; padding-right: 0px;"><span style="display: inline-block; width: 100%; height: 5px; background-color: rgb(153, 153, 153);"></span><br/><span style="font-size: 12px; letter-spacing: 0.5px; line-height: 1.75em; color: rgb(153, 153, 153); display: none;">` + Float64ToString(flat) + `</span></td>`
-	html += `<td valign="top" style="width: ` + fmt.Sprintf("%.2f", up/(down+flat+up)*90) + `%-20px; border: 0px; text-align: center; padding-left: 0px; padding-right: 0px;"><span style="display: inline-block; border-radius: 0 5px 5px 0; width: 100%; height: 5px; background-color: rgb(246, 66, 69);"></span><br/><span style="font-size: 12px; letter-spacing: 0.5px; line-height: 1.75em; color: rgb(246, 66, 69);">` + Float64ToString(up) + `</span></td>`
-	html += `<td valign="top" style="width: 60px; border: 0px; text-align: center; padding-left: 0px; padding-right: 0px;"><span style="font-size: 12px; letter-spacing: 0.5px; line-height: 1.75em; color: rgb(246, 66, 69);">` + fmt.Sprintf("%.0f", (up/(up+flat+down))*100) + "℃" + `</span><br/><span style="font-size: 12px; letter-spacing: 0.5px; line-height: 1.75em; color: rgb(246, 66, 69); display: none;">` + fmt.Sprintf("%.0f", (up/(up+flat+down))*100) + "℃" + `</span></td>`
+	html += `<td valign="top" style="width: ` + fmt.Sprintf("%.2f", down/(down+flat+up)*90) + `%-25px; border: 0px; text-align: center; padding-left: 0px; padding-right: 0px; padding-top: 12px;"><span style="display: inline-block; border-radius: 5px 0 0 5px; width: 100%; height: 5px; background-color: rgb(0, 171, 59);"></span><br/><span style="font-size: 12px; letter-spacing: 0.5px; line-height: 1.75em; color: rgb(0, 171, 59);">` + Float64ToString(down) + `</span></td>`
+	html += `<td valign="top" style="width: ` + fmt.Sprintf("%.2f", flat/(down+flat+up)*90) + `%; border: 0px; text-align: center; padding-left: 0px; padding-right: 0px; padding-top: 12px;"><span style="display: inline-block; width: 100%; height: 5px; background-color: rgb(153, 153, 153);"></span><br/><span style="font-size: 12px; letter-spacing: 0.5px; line-height: 1.75em; color: rgb(153, 153, 153); display: none;">` + Float64ToString(flat) + `</span></td>`
+	html += `<td valign="top" style="width: ` + fmt.Sprintf("%.2f", up/(down+flat+up)*90) + `%-25px; border: 0px; text-align: center; padding-left: 0px; padding-right: 0px; padding-top: 12px;"><span style="display: inline-block; border-radius: 0 5px 5px 0; width: 100%; height: 5px; background-color: rgb(246, 66, 69);"></span><br/><span style="font-size: 12px; letter-spacing: 0.5px; line-height: 1.75em; color: rgb(246, 66, 69);">` + Float64ToString(up) + `</span></td>`
+	html += `<td valign="top" style="width: 50px; border: 0px; text-align: center; padding-left: 0px; padding-right: 0px;"><span style="font-size: 12px; letter-spacing: 0.5px; line-height: 1.75em; color: rgb(246, 66, 69);">` + fmt.Sprintf("%.0f", (up/(up+flat+down))*100) + "℃" + `</span></td>`
 	html += `</tr>`
 	html += `</tbody></table>`
 

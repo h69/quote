@@ -144,6 +144,15 @@ func GetHourMinute(timestamp int64) string {
 	return time.Unix(timestamp, 0).Format("15:04")
 }
 
+// GetPercentSign 获取百分比符号
+func GetPercentSign(percent float64) string {
+	var sign string
+	if percent > 0 {
+		sign = "+"
+	}
+	return sign
+}
+
 // Sprintf 格式化对象结构
 func Sprintf(v interface{}) string {
 	b, err := json.Marshal(v)
