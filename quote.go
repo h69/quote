@@ -187,11 +187,12 @@ func GetStockMarketIndex() []Stock {
 
 	for _, stock := range resp.Data.IndexQuote {
 		stocks = append(stocks, Stock{
-			Name:    stock.SecuName,
-			Code:    strings.ToUpper(stock.SecuCode),
-			Current: fmt.Sprintf("%.2f", stock.LastPx),
-			Percent: GetPercentSign(stock.Change) + fmt.Sprintf("%.2f", stock.Change*100) + "%",
-			Value:   "",
+			Name:               stock.SecuName,
+			Code:               strings.ToUpper(stock.SecuCode),
+			Current:            fmt.Sprintf("%.2f", stock.LastPx),
+			Percent:            GetPercentSign(stock.Change) + fmt.Sprintf("%.2f", stock.Change*100) + "%",
+			CurrentYearPercent: GetStockCurrentYearPercentByCode(stock.SecuCode),
+			Value:              "",
 		})
 	}
 
@@ -503,11 +504,12 @@ func GetStockFollow() []Stock {
 
 	for _, stock := range resp.Data.List {
 		stocks = append(stocks, Stock{
-			Name:    stock.Name,
-			Code:    stock.Symbol,
-			Current: fmt.Sprintf("%.2f", stock.Current),
-			Percent: GetPercentSign(stock.Pct) + fmt.Sprintf("%.2f", stock.Pct) + "%",
-			Value:   "",
+			Name:               stock.Name,
+			Code:               stock.Symbol,
+			Current:            fmt.Sprintf("%.2f", stock.Current),
+			Percent:            GetPercentSign(stock.Pct) + fmt.Sprintf("%.2f", stock.Pct) + "%",
+			CurrentYearPercent: GetStockCurrentYearPercentByCode(stock.Symbol),
+			Value:              "",
 		})
 	}
 
@@ -567,11 +569,12 @@ func GetStockMao20() []Stock {
 		}
 
 		stocks = append(stocks, Stock{
-			Name:    resp.Data.SecuName,
-			Code:    strings.ToUpper(resp.Data.SecuCode),
-			Current: fmt.Sprintf("%.2f", resp.Data.LastPx),
-			Percent: GetPercentSign(resp.Data.Change) + fmt.Sprintf("%.2f", resp.Data.Change*100) + "%",
-			Value:   "",
+			Name:               resp.Data.SecuName,
+			Code:               strings.ToUpper(resp.Data.SecuCode),
+			Current:            fmt.Sprintf("%.2f", resp.Data.LastPx),
+			Percent:            GetPercentSign(resp.Data.Change) + fmt.Sprintf("%.2f", resp.Data.Change*100) + "%",
+			CurrentYearPercent: GetStockCurrentYearPercentByCode(resp.Data.SecuCode),
+			Value:              "",
 		})
 	}
 
@@ -620,4 +623,35 @@ func GetStockEvents() []Event {
 	log.Println(Sprintf(events))
 
 	return events
+}
+
+// GetStockCurrentYearPercentByCode 获取股票年涨幅
+func GetStockCurrentYearPercentByCode(code string) string {
+	body, err := Get("https://x-quote.cls.cn/quote/stock/kline?app=CailianpressWeb&limit=1&offset=0&type=fy&secu_code=" + strings.ToLower(code))
+	if err != nil {
+		panic(err)
+	}
+
+	log.Println(body)
+
+	type Resp struct {
+		Data []struct {
+			Change float64 `json:"change"`
+		} `json:"data"`
+	}
+
+	var resp Resp
+	err = json.Unmarshal([]byte(body), &resp)
+	if err != nil {
+		panic(err)
+	}
+
+	var currentYearPercent string
+	if len(resp.Data) > 0 {
+		currentYearPercent = GetPercentSign(resp.Data[0].Change) + fmt.Sprintf("%.2f", resp.Data[0].Change*100) + "%"
+	}
+
+	log.Println(currentYearPercent)
+
+	return currentYearPercent
 }
