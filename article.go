@@ -23,8 +23,18 @@ func GenerateArticle() Article {
 	article.Cover = cover
 
 	stockCloseTime := GetStockCloseTime()
-	stockMarketIndex := GetStockMarketIndex()
 	stockMarketOverview := GetStockMarketOverview()
+	stockMarketIndex := GetStockMarketIndex()
+	stockIndustry := GetStockIndustry()
+	stockFollow := GetStockFollow()
+	stockMao20 := GetStockMao20()
+	stockPercent := GetStockPercent()
+	stockCurrentYearPercent := GetStockCurrentYearPercent()
+	stockCurrent := GetStockCurrent()
+	stockMarketCapital := GetStockMarketCapital()
+	stockVolume := GetStockVolume()
+	stockAmount := GetStockAmount()
+	stockEvent := GetStockEvent()
 
 	// 摘要
 	var down, flat, up float64
@@ -58,38 +68,64 @@ func GenerateArticle() Article {
 	// 内容
 	article.Content += RenderHeader("👆点击关注，领取一只行情精灵")
 	article.Content += RenderPlaceholder()
-	article.Content += RenderStockChart(stockMarketOverview)
+	if len(stockMarketOverview) > 0 {
+		article.Content += RenderStockChart(stockMarketOverview)
+		article.Content += RenderStockThermometer(stockMarketOverview)
+	}
+	if len(stockIndustry) > 0 {
+		article.Content += RenderStockPlate(stockIndustry)
+	}
 	article.Content += RenderPlaceholder()
-	article.Content += RenderSubtitle("大盘指数")
-	article.Content += RenderStockTable(stockMarketIndex)
-	article.Content += RenderPlaceholder()
-	article.Content += RenderSubtitle("热门榜")
-	article.Content += RenderStockTable(GetStockFollow())
-	article.Content += RenderPlaceholder()
-	article.Content += RenderSubtitle("招财大牛猫茅 20 组合")
-	article.Content += RenderStockTable(GetStockMao20())
-	article.Content += RenderPlaceholder()
-	article.Content += RenderSubtitle("日涨幅榜")
-	article.Content += RenderStockTable(GetStockPercent())
-	article.Content += RenderPlaceholder()
-	article.Content += RenderSubtitle("年涨幅榜")
-	article.Content += RenderStockTable(GetStockCurrentYearPercent())
-	article.Content += RenderPlaceholder()
-	article.Content += RenderSubtitle("价格榜")
-	article.Content += RenderStockTable(GetStockCurrent())
-	article.Content += RenderPlaceholder()
-	article.Content += RenderSubtitle("市值榜/万亿")
-	article.Content += RenderStockTable(GetStockMarketCapital())
-	article.Content += RenderPlaceholder()
-	article.Content += RenderSubtitle("成交量榜/亿")
-	article.Content += RenderStockTable(GetStockVolume())
-	article.Content += RenderPlaceholder()
-	article.Content += RenderSubtitle("成交额榜/亿")
-	article.Content += RenderStockTable(GetStockAmount())
-	article.Content += RenderPlaceholder()
-	article.Content += RenderSubtitle("行情回顾")
-	article.Content += RenderStockEvent(GetStockEvents())
-	article.Content += RenderPlaceholder()
+	if len(stockMarketIndex) > 0 {
+		article.Content += RenderSubtitle("大盘指数")
+		article.Content += RenderStockTable(stockMarketIndex)
+		article.Content += RenderPlaceholder()
+	}
+	if len(stockFollow) > 0 {
+		article.Content += RenderSubtitle("热股榜")
+		article.Content += RenderStockTable(stockFollow)
+		article.Content += RenderPlaceholder()
+	}
+	if len(stockMao20) > 0 {
+		article.Content += RenderSubtitle("招财大牛猫茅 20 组合")
+		article.Content += RenderStockTable(stockMao20)
+		article.Content += RenderPlaceholder()
+	}
+	if len(stockPercent) > 0 {
+		article.Content += RenderSubtitle("日涨幅榜")
+		article.Content += RenderStockTable(stockPercent)
+		article.Content += RenderPlaceholder()
+	}
+	if len(stockCurrentYearPercent) > 0 {
+		article.Content += RenderSubtitle("年涨幅榜")
+		article.Content += RenderStockTable(stockCurrentYearPercent)
+		article.Content += RenderPlaceholder()
+	}
+	if len(stockCurrent) > 0 {
+		article.Content += RenderSubtitle("价格榜")
+		article.Content += RenderStockTable(stockCurrent)
+		article.Content += RenderPlaceholder()
+	}
+	if len(stockMarketCapital) > 0 {
+		article.Content += RenderSubtitle("市值榜/万亿")
+		article.Content += RenderStockTable(stockMarketCapital)
+		article.Content += RenderPlaceholder()
+	}
+	if len(stockVolume) > 0 {
+		article.Content += RenderSubtitle("成交量榜/亿")
+		article.Content += RenderStockTable(stockVolume)
+		article.Content += RenderPlaceholder()
+	}
+	if len(stockAmount) > 0 {
+		article.Content += RenderSubtitle("成交额榜/亿")
+		article.Content += RenderStockTable(stockAmount)
+		article.Content += RenderPlaceholder()
+	}
+	if len(stockEvent) > 0 {
+		article.Content += RenderSubtitle("行情回顾")
+		article.Content += RenderStockEvent(stockEvent)
+		article.Content += RenderPlaceholder()
+	}
 	article.Content += RenderFooter("涨停三连「分享」「点赞」「在看」👇")
 
 	log.Println(article.Content)

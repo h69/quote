@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"log"
+	"time"
 
 	"github.com/robfig/cron"
 )
@@ -23,15 +24,32 @@ func main() {
 
 	c := cron.New()
 	c.AddFunc("0 10 15 * * ?", func() {
-		defer func() {
-			if err := recover(); err != nil {
-				log.Println(err)
-			}
-		}()
+		for i := 0; i < 3; i++ {
+			if func() bool {
+				defer func() {
+					if err := recover(); err != nil {
+						log.Println(err)
+					}
+				}()
 
-		if GetStockCloseTime() == GetDate(0) {
-			article := GenerateArticle()
-			AddNews(article.Title, article.Digest, article.Content, article.Cover)
+				stockCloseTime := GetStockCloseTime()
+
+				if stockCloseTime != "" {
+					if stockCloseTime == GetDate(0) {
+						article := GenerateArticle()
+						AddNews(article.Title, article.Digest, article.Content, article.Cover)
+					}
+					return true
+				}
+
+				return false
+
+			}() {
+				break
+
+			} else {
+				time.Sleep(3 * time.Second)
+			}
 		}
 	})
 	c.Start()

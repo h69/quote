@@ -583,8 +583,8 @@ func GetStockMao20() []Stock {
 	return stocks
 }
 
-// GetStockEvents 获取股票事件
-func GetStockEvents() []Event {
+// GetStockEvent 获取股票事件
+func GetStockEvent() []Event {
 	var events []Event
 
 	body, err := Get("https://api.wallstcn.com/apiv1/search/live?channel=a-stock-channel&limit=100&score=2")
@@ -654,4 +654,54 @@ func GetStockCurrentYearPercentByCode(code string) string {
 	log.Println(currentYearPercent)
 
 	return currentYearPercent
+}
+
+// GetStockIndustry 获取股票热门行业
+func GetStockIndustry() []Stock {
+	var stocks []Stock
+
+	body, err := Get("https://x-quote.cls.cn/web_quote/plate/plate_list?app=CailianpressWeb&type=industry&page=1&rever=1")
+	if err != nil {
+		panic(err)
+	}
+
+	log.Println(body)
+
+	type Resp struct {
+		Data struct {
+			PlateData []struct {
+				SecuName string  `json:"secu_name"`
+				Change   float64 `json:"change"`
+			} `json:"plate_data"`
+		} `json:"data"`
+	}
+
+	var resp Resp
+	err = json.Unmarshal([]byte(body), &resp)
+	if err != nil {
+		panic(err)
+	}
+
+	if len(resp.Data.PlateData) >= 9 {
+		resp.Data.PlateData = resp.Data.PlateData[:9]
+	} else if len(resp.Data.PlateData) >= 6 {
+		resp.Data.PlateData = resp.Data.PlateData[:6]
+	} else {
+		return stocks
+	}
+
+	for _, stock := range resp.Data.PlateData {
+		stocks = append(stocks, Stock{
+			Name:               stock.SecuName,
+			Code:               "",
+			Current:            "",
+			Percent:            GetPercentSign(stock.Change) + fmt.Sprintf("%.2f", stock.Change*100) + "%",
+			CurrentYearPercent: "",
+			Value:              "",
+		})
+	}
+
+	log.Println(Sprintf(stocks))
+
+	return stocks
 }
