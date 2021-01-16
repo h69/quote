@@ -30,6 +30,15 @@ func RenderPlaceholder() string {
 	return `<p style="text-align: center;"><br></p>`
 }
 
+// RenderContent 内容
+func RenderContent(contents []string) string {
+	html := `<p style="height: 10px; min-height: 0px;"></p>`
+	for _, content := range contents {
+		html += `<p style="padding-right: 10px; padding-left: 10px;"><span style="font-size: 15px; letter-spacing: 0.5px; line-height: 1.75em; white-space: normal;">` + content + `</span></p><p style="text-align: center;"><br></p>`
+	}
+	return html
+}
+
 // RenderStockTable 股票表格
 func RenderStockTable(stocks []Stock) string {
 	html := `<table style="width: 100%; padding-right: 16px; padding-left: 16px; border: 0px; line-height: 0;"><tbody>`

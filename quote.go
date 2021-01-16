@@ -34,9 +34,12 @@ type Event struct {
 
 // GetStockCloseTime 获取股票休市时间
 func GetStockCloseTime() string {
+	var date string
+
 	body, err := Get("https://x-quote.cls.cn/quote/stock/tline?app=CailianpressWeb&fields=date&secu_code=sh000001")
 	if err != nil {
-		panic(err)
+		log.Println(err)
+		return date
 	}
 
 	log.Println(body)
@@ -50,10 +53,10 @@ func GetStockCloseTime() string {
 	var resp Resp
 	err = json.Unmarshal([]byte(body), &resp)
 	if err != nil {
-		panic(err)
+		log.Println(err)
+		return date
 	}
 
-	var date string
 	if len(resp.Data.Date) > 0 {
 		for i, s := range Int64ToString(resp.Data.Date[0]) {
 			date += string(s)
@@ -74,7 +77,8 @@ func GetStockMarketOverview() []Bar {
 
 	body, err := Get("https://x-quote.cls.cn/quote/index/home?app=CailianpressWeb")
 	if err != nil {
-		panic(err)
+		log.Println(err)
+		return bars
 	}
 
 	log.Println(body)
@@ -106,7 +110,8 @@ func GetStockMarketOverview() []Bar {
 	var resp Resp
 	err = json.Unmarshal([]byte(body), &resp)
 	if err != nil {
-		panic(err)
+		log.Println(err)
+		return bars
 	}
 
 	bars = append(bars, Bar{
@@ -163,7 +168,8 @@ func GetStockMarketIndex() []Stock {
 
 	body, err := Get("https://x-quote.cls.cn/quote/index/home?app=CailianpressWeb")
 	if err != nil {
-		panic(err)
+		log.Println(err)
+		return stocks
 	}
 
 	log.Println(body)
@@ -182,7 +188,8 @@ func GetStockMarketIndex() []Stock {
 	var resp Resp
 	err = json.Unmarshal([]byte(body), &resp)
 	if err != nil {
-		panic(err)
+		log.Println(err)
+		return stocks
 	}
 
 	for _, stock := range resp.Data.IndexQuote {
@@ -207,7 +214,8 @@ func GetStockMarketCapital() []Stock {
 
 	body, err := Get("https://xueqiu.com/service/v5/stock/screener/quote/list?page=1&size=10&order=desc&orderby=market_capital&order_by=market_capital&market=CN&type=sh_sz")
 	if err != nil {
-		panic(err)
+		log.Println(err)
+		return stocks
 	}
 
 	log.Println(body)
@@ -228,7 +236,8 @@ func GetStockMarketCapital() []Stock {
 	var resp Resp
 	err = json.Unmarshal([]byte(body), &resp)
 	if err != nil {
-		panic(err)
+		log.Println(err)
+		return stocks
 	}
 
 	for _, stock := range resp.Data.List {
@@ -253,7 +262,8 @@ func GetStockCurrent() []Stock {
 
 	body, err := Get("https://xueqiu.com/service/v5/stock/screener/quote/list?page=1&size=10&order=desc&orderby=current&order_by=current&market=CN&type=sh_sz")
 	if err != nil {
-		panic(err)
+		log.Println(err)
+		return stocks
 	}
 
 	log.Println(body)
@@ -273,7 +283,8 @@ func GetStockCurrent() []Stock {
 	var resp Resp
 	err = json.Unmarshal([]byte(body), &resp)
 	if err != nil {
-		panic(err)
+		log.Println(err)
+		return stocks
 	}
 
 	for _, stock := range resp.Data.List {
@@ -298,7 +309,8 @@ func GetStockVolume() []Stock {
 
 	body, err := Get("https://xueqiu.com/service/v5/stock/screener/quote/list?page=1&size=10&order=desc&orderby=volume&order_by=volume&market=CN&type=sh_sz")
 	if err != nil {
-		panic(err)
+		log.Println(err)
+		return stocks
 	}
 
 	log.Println(body)
@@ -319,7 +331,8 @@ func GetStockVolume() []Stock {
 	var resp Resp
 	err = json.Unmarshal([]byte(body), &resp)
 	if err != nil {
-		panic(err)
+		log.Println(err)
+		return stocks
 	}
 
 	for _, stock := range resp.Data.List {
@@ -344,7 +357,8 @@ func GetStockAmount() []Stock {
 
 	body, err := Get("https://xueqiu.com/service/v5/stock/screener/quote/list?page=1&size=10&order=desc&orderby=amount&order_by=amount&market=CN&type=sh_sz")
 	if err != nil {
-		panic(err)
+		log.Println(err)
+		return stocks
 	}
 
 	log.Println(body)
@@ -365,7 +379,8 @@ func GetStockAmount() []Stock {
 	var resp Resp
 	err = json.Unmarshal([]byte(body), &resp)
 	if err != nil {
-		panic(err)
+		log.Println(err)
+		return stocks
 	}
 
 	for _, stock := range resp.Data.List {
@@ -390,7 +405,8 @@ func GetStockCurrentYearPercent() []Stock {
 
 	body, err := Get("https://xueqiu.com/service/v5/stock/screener/quote/list?page=1&size=10&order=desc&orderby=current_year_percent&order_by=current_year_percent&market=CN&type=sh_sz")
 	if err != nil {
-		panic(err)
+		log.Println(err)
+		return stocks
 	}
 
 	log.Println(body)
@@ -410,7 +426,8 @@ func GetStockCurrentYearPercent() []Stock {
 	var resp Resp
 	err = json.Unmarshal([]byte(body), &resp)
 	if err != nil {
-		panic(err)
+		log.Println(err)
+		return stocks
 	}
 
 	for _, stock := range resp.Data.List {
@@ -435,7 +452,8 @@ func GetStockPercent() []Stock {
 
 	body, err := Get("https://xueqiu.com/service/v5/stock/screener/quote/list?page=1&size=10&order=desc&orderby=percent&order_by=percent&market=CN&type=sh_sz")
 	if err != nil {
-		panic(err)
+		log.Println(err)
+		return stocks
 	}
 
 	log.Println(body)
@@ -455,7 +473,8 @@ func GetStockPercent() []Stock {
 	var resp Resp
 	err = json.Unmarshal([]byte(body), &resp)
 	if err != nil {
-		panic(err)
+		log.Println(err)
+		return stocks
 	}
 
 	for _, stock := range resp.Data.List {
@@ -480,7 +499,8 @@ func GetStockFollow() []Stock {
 
 	body, err := Get("https://xueqiu.com/service/v5/stock/screener/screen?category=CN&size=10&order=desc&order_by=follow7d&only_count=0&page=1")
 	if err != nil {
-		panic(err)
+		log.Println(err)
+		return stocks
 	}
 
 	log.Println(body)
@@ -499,7 +519,8 @@ func GetStockFollow() []Stock {
 	var resp Resp
 	err = json.Unmarshal([]byte(body), &resp)
 	if err != nil {
-		panic(err)
+		log.Println(err)
+		return stocks
 	}
 
 	for _, stock := range resp.Data.List {
@@ -548,7 +569,8 @@ func GetStockMao20() []Stock {
 	for _, code := range codes {
 		body, err := Get("https://x-quote.cls.cn/quote/stock/basic?secu_code=" + code + "&fields=secu_name,secu_code,last_px,change&app=CailianpressWeb")
 		if err != nil {
-			panic(err)
+			log.Println(err)
+			return []Stock{}
 		}
 
 		log.Println(body)
@@ -565,7 +587,8 @@ func GetStockMao20() []Stock {
 		var resp Resp
 		err = json.Unmarshal([]byte(body), &resp)
 		if err != nil {
-			panic(err)
+			log.Println(err)
+			return []Stock{}
 		}
 
 		stocks = append(stocks, Stock{
@@ -589,7 +612,8 @@ func GetStockEvent() []Event {
 
 	body, err := Get("https://api.wallstcn.com/apiv1/search/live?channel=a-stock-channel&limit=100&score=2")
 	if err != nil {
-		panic(err)
+		log.Println(err)
+		return events
 	}
 
 	log.Println(body)
@@ -606,7 +630,8 @@ func GetStockEvent() []Event {
 	var resp Resp
 	err = json.Unmarshal([]byte(body), &resp)
 	if err != nil {
-		panic(err)
+		log.Println(err)
+		return events
 	}
 
 	closeTime := GetStockCloseTime()
@@ -627,9 +652,12 @@ func GetStockEvent() []Event {
 
 // GetStockCurrentYearPercentByCode 获取股票年涨幅
 func GetStockCurrentYearPercentByCode(code string) string {
+	var currentYearPercent string
+
 	body, err := Get("https://x-quote.cls.cn/quote/stock/kline?app=CailianpressWeb&limit=1&offset=0&type=fy&secu_code=" + strings.ToLower(code))
 	if err != nil {
-		panic(err)
+		log.Println(err)
+		return currentYearPercent
 	}
 
 	log.Println(body)
@@ -643,10 +671,10 @@ func GetStockCurrentYearPercentByCode(code string) string {
 	var resp Resp
 	err = json.Unmarshal([]byte(body), &resp)
 	if err != nil {
-		panic(err)
+		log.Println(err)
+		return currentYearPercent
 	}
 
-	var currentYearPercent string
 	if len(resp.Data) > 0 {
 		currentYearPercent = GetPercentSign(resp.Data[0].Change) + fmt.Sprintf("%.2f", resp.Data[0].Change*100) + "%"
 	}
@@ -662,7 +690,8 @@ func GetStockIndustry() []Stock {
 
 	body, err := Get("https://x-quote.cls.cn/web_quote/plate/plate_list?app=CailianpressWeb&type=industry&page=1&rever=1")
 	if err != nil {
-		panic(err)
+		log.Println(err)
+		return stocks
 	}
 
 	log.Println(body)
@@ -679,7 +708,8 @@ func GetStockIndustry() []Stock {
 	var resp Resp
 	err = json.Unmarshal([]byte(body), &resp)
 	if err != nil {
-		panic(err)
+		log.Println(err)
+		return stocks
 	}
 
 	if len(resp.Data.PlateData) >= 9 {
@@ -704,4 +734,87 @@ func GetStockIndustry() []Stock {
 	log.Println(Sprintf(stocks))
 
 	return stocks
+}
+
+// GetStockChance 获取股票机会
+func GetStockChance() []string {
+	var contents []string
+
+	body, err := Get("https://www.cls.cn/api/subject/recommend/article?app=CailianpressWeb&os=web&sv=7.5.5&sign=091f85dd6463852f8445039d60b4633d", "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.141 Safari/537.36")
+	if err != nil {
+		log.Println(err)
+		return contents
+	}
+
+	log.Println(body)
+
+	type Resp struct {
+		Data struct {
+			ProspectArticle struct {
+				Title string `json:"title"`
+			} `json:"prospect_article"`
+			TodayChances []struct {
+				SubjectName string `json:"subject_name"`
+				ArticleName string `json:"article_name"`
+				StockList   []struct {
+					Name string `json:"name"`
+				} `json:"stock_list"`
+			} `json:"today_chances"`
+			TodayTuyeres []struct {
+				SubjectName string `json:"subject_name"`
+				Driver      string `json:"driver"`
+				Stocks      []struct {
+					Name string `json:"name"`
+				} `json:"stocks"`
+			} `json:"today_tuyeres"`
+			ShortLatents []struct {
+				SubjectName        string `json:"subject_name"`
+				SubjectDescription string `json:"subject_description"`
+				CashTime           string `json:"cash_time"`
+			} `json:"short_latents"`
+			LongChances []struct {
+				SubjectName string `json:"subject_name"`
+				ArticleName string `json:"article_name"`
+				Stocks      []struct {
+					Name string `json:"name"`
+				} `json:"stocks"`
+			} `json:"long_chances"`
+		} `json:"data"`
+	}
+
+	var resp Resp
+	err = json.Unmarshal([]byte(body), &resp)
+	if err != nil {
+		log.Println(err)
+		return contents
+	}
+
+	for _, chance := range resp.Data.TodayChances {
+		var stocks []string
+		for _, stock := range chance.StockList {
+			stocks = append(stocks, stock.Name)
+		}
+		contents = append(contents, chance.SubjectName+"："+chance.ArticleName+"（"+strings.Join(stocks, "、")+"）")
+	}
+	for _, tuyere := range resp.Data.TodayTuyeres {
+		var stocks []string
+		for _, stock := range tuyere.Stocks {
+			stocks = append(stocks, stock.Name)
+		}
+		contents = append(contents, tuyere.SubjectName+"："+tuyere.Driver+"（"+strings.Join(stocks, "、")+"）")
+	}
+	for _, chance := range resp.Data.LongChances {
+		var stocks []string
+		for _, stock := range chance.Stocks {
+			stocks = append(stocks, stock.Name)
+		}
+		contents = append(contents, chance.SubjectName+"："+chance.ArticleName+"（"+strings.Join(stocks, "、")+"）")
+	}
+	for _, latent := range resp.Data.ShortLatents {
+		contents = append(contents, latent.SubjectName+"："+latent.SubjectDescription+"（"+latent.CashTime+"）")
+	}
+
+	log.Println(Sprintf(contents))
+
+	return contents
 }

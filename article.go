@@ -19,9 +19,6 @@ type Article struct {
 
 // GenerateArticle 生成文章
 func GenerateArticle() Article {
-	var article Article
-	article.Cover = cover
-
 	stockCloseTime := GetStockCloseTime()
 	stockMarketOverview := GetStockMarketOverview()
 	stockMarketIndex := GetStockMarketIndex()
@@ -35,6 +32,11 @@ func GenerateArticle() Article {
 	stockVolume := GetStockVolume()
 	stockAmount := GetStockAmount()
 	stockEvent := GetStockEvent()
+	stockChance := GetStockChance()
+
+	// 封面
+	var article Article
+	article.Cover = cover
 
 	// 摘要
 	var down, flat, up float64
@@ -126,8 +128,15 @@ func GenerateArticle() Article {
 		article.Content += RenderStockEvent(stockEvent)
 		article.Content += RenderPlaceholder()
 	}
+	if len(stockChance) > 0 {
+		article.Content += RenderSubtitle("市场机会")
+		article.Content += RenderContent(stockChance)
+		article.Content += RenderPlaceholder()
+	}
 	article.Content += RenderFooter("涨停三连「分享」「点赞」「在看」👇")
 
+	log.Println(article.Title)
+	log.Println(article.Digest)
 	log.Println(article.Content)
 
 	return article

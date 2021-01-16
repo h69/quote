@@ -20,8 +20,20 @@ func Convert(src string, srcEncoder string, desEncoder string) string {
 }
 
 // Get 请求
-func Get(url string) (string, error) {
-	resp, err := http.Get(url)
+func Get(url string, headers ...string) (string, error) {
+	client := &http.Client{}
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return "", err
+	}
+	for _, header := range headers {
+		name := strings.Split(header, ":")[0]
+		value := strings.Replace(header, name, "", 1)
+		value = strings.Replace(value, ":", "", 1)
+		value = strings.Trim(value, " ")
+		req.Header.Set(name, value)
+	}
+	resp, err := client.Do(req)
 	if err != nil {
 		return "", err
 	}
