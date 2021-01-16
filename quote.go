@@ -794,24 +794,40 @@ func GetStockChance() []string {
 		for _, stock := range chance.StockList {
 			stocks = append(stocks, stock.Name)
 		}
-		contents = append(contents, chance.SubjectName+"："+chance.ArticleName+"（"+strings.Join(stocks, "、")+"）")
+		var comment string
+		if len(stocks) > 0 {
+			comment = "（" + strings.Join(stocks, "、") + "）"
+		}
+		contents = append(contents, chance.SubjectName+"："+chance.ArticleName+comment)
 	}
 	for _, tuyere := range resp.Data.TodayTuyeres {
 		var stocks []string
 		for _, stock := range tuyere.Stocks {
 			stocks = append(stocks, stock.Name)
 		}
-		contents = append(contents, tuyere.SubjectName+"："+tuyere.Driver+"（"+strings.Join(stocks, "、")+"）")
+		var comment string
+		if len(stocks) > 0 {
+			comment = "（" + strings.Join(stocks, "、") + "）"
+		}
+		contents = append(contents, tuyere.SubjectName+"："+tuyere.Driver+comment)
 	}
 	for _, chance := range resp.Data.LongChances {
 		var stocks []string
 		for _, stock := range chance.Stocks {
 			stocks = append(stocks, stock.Name)
 		}
-		contents = append(contents, chance.SubjectName+"："+chance.ArticleName+"（"+strings.Join(stocks, "、")+"）")
+		var comment string
+		if len(stocks) > 0 {
+			comment = "（" + strings.Join(stocks, "、") + "）"
+		}
+		contents = append(contents, chance.SubjectName+"："+chance.ArticleName+comment)
 	}
 	for _, latent := range resp.Data.ShortLatents {
-		contents = append(contents, latent.SubjectName+"："+latent.SubjectDescription+"（"+latent.CashTime+"）")
+		var comment string
+		if latent.CashTime != "" {
+			comment = "（" + latent.CashTime + "）"
+		}
+		contents = append(contents, latent.SubjectName+"："+latent.SubjectDescription+comment)
 	}
 
 	log.Println(Sprintf(contents))
