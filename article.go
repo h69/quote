@@ -149,6 +149,10 @@ func GenerateArticle() Article {
 		article.Content += RenderContent(stockChance)
 		article.Content += RenderPlaceholder()
 	}
+	author, motto := GetMotto()
+	article.Content += RenderSubtitle(author)
+	article.Content += RenderContent([]string{motto})
+	article.Content += RenderPlaceholder()
 	article.Content += RenderFooter("牛市三连「分享」「点赞」「在看」👇")
 
 	log.Println(article.Title)
