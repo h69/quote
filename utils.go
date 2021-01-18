@@ -65,6 +65,16 @@ func PostForm(url string, data url.Values) (string, error) {
 	return string(body), err
 }
 
+// Find 从前往后查找下标
+func Find(str string, char string) int {
+	for i := 0; i < len([]rune(str)); i++ {
+		if string([]rune(str)[i]) == char {
+			return i
+		}
+	}
+	return -1
+}
+
 // FindInvert 从后往前查找下标
 func FindInvert(str string, char string) int {
 	for i := len([]rune(str)) - 1; i >= 0; i-- {

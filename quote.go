@@ -32,6 +32,12 @@ type Event struct {
 	Time    string
 }
 
+// Content 内容
+type Content struct {
+	Content string
+	Strong  bool
+}
+
 // GetStockCloseTime 获取股票休市时间
 func GetStockCloseTime() string {
 	var date string
@@ -798,7 +804,7 @@ func GetStockChance() []string {
 		if len(stocks) > 0 {
 			comment = "（" + strings.Join(stocks, "、") + "）"
 		}
-		contents = append(contents, chance.SubjectName+"："+chance.ArticleName+comment)
+		contents = append(contents, chance.SubjectName+"："+strings.TrimRight(chance.ArticleName, "。")+comment)
 	}
 	for _, tuyere := range resp.Data.TodayTuyeres {
 		var stocks []string
@@ -809,7 +815,7 @@ func GetStockChance() []string {
 		if len(stocks) > 0 {
 			comment = "（" + strings.Join(stocks, "、") + "）"
 		}
-		contents = append(contents, tuyere.SubjectName+"："+tuyere.Driver+comment)
+		contents = append(contents, tuyere.SubjectName+"："+strings.TrimRight(tuyere.Driver, "。")+comment)
 	}
 	for _, chance := range resp.Data.LongChances {
 		var stocks []string
@@ -820,14 +826,14 @@ func GetStockChance() []string {
 		if len(stocks) > 0 {
 			comment = "（" + strings.Join(stocks, "、") + "）"
 		}
-		contents = append(contents, chance.SubjectName+"："+chance.ArticleName+comment)
+		contents = append(contents, chance.SubjectName+"："+strings.TrimRight(chance.ArticleName, "。")+comment)
 	}
 	for _, latent := range resp.Data.ShortLatents {
 		var comment string
 		if latent.CashTime != "" {
 			comment = "（" + latent.CashTime + "）"
 		}
-		contents = append(contents, latent.SubjectName+"："+latent.SubjectDescription+comment)
+		contents = append(contents, latent.SubjectName+"："+strings.TrimRight(latent.SubjectDescription, "。")+comment)
 	}
 
 	log.Println(Sprintf(contents))
@@ -936,4 +942,53 @@ func GetStockForeign() []Stock {
 	log.Println(Sprintf(stocks))
 
 	return stocks
+}
+
+// GetStockComment 获取股票评论
+func GetStockComment() []string {
+	var contents []string
+
+	body, err := Get("https://www.cls.cn/nodeapi/telegraphList?app=CailianpressWeb&refresh_type=1&rn=50", "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.141 Safari/537.36")
+	if err != nil {
+		log.Println(err)
+		return contents
+	}
+
+	log.Println(body)
+
+	type Resp struct {
+		Data struct {
+			RollData []struct {
+				Title   string `json:"title"`
+				Content string `json:"content"`
+				Ctime   int64  `json:"ctime"`
+			} `json:"roll_data"`
+		} `json:"data"`
+	}
+
+	var resp Resp
+	err = json.Unmarshal([]byte(body), &resp)
+	if err != nil {
+		log.Println(err)
+		return contents
+	}
+
+	closeTime := GetStockCloseTime()
+
+	for _, data := range resp.Data.RollData {
+		if data.Ctime >= GetTimestamp(closeTime+" 15:00:00") || strings.Contains(data.Title, "收评：") {
+			title := strings.TrimLeft(data.Title, "收评：")
+			title = "<strong>" + title + "</strong>"
+			content := strings.Replace(data.Content, "【"+data.Title+"】", "", 1)
+			content = strings.TrimLeft(content, "财联社")
+			content = string([]rune(content)[Find(content, "，")+1:])
+			contents = append(contents, title)
+			contents = append(contents, content)
+			break
+		}
+	}
+
+	log.Println(Sprintf(contents))
+
+	return contents
 }

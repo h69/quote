@@ -23,6 +23,7 @@ func GenerateArticle() Article {
 	stockMarketOverview := GetStockMarketOverview()
 	stockMarketForeign := GetStockMarketForeign()
 	stockIndustry := GetStockIndustry()
+	stockComment := GetStockComment()
 	stockMarketIndex := GetStockMarketIndex()
 	stockFollow := GetStockFollow()
 	stockMao20 := GetStockMao20()
@@ -70,7 +71,7 @@ func GenerateArticle() Article {
 	}
 
 	// 内容
-	article.Content += RenderHeader("👆点击关注，领取一只行情精灵")
+	article.Content += RenderHeader("👆点击关注，领取你的行情精灵")
 	article.Content += RenderPlaceholder()
 	if len(stockMarketOverview) > 0 {
 		article.Content += RenderStockChart(stockMarketOverview)
@@ -83,6 +84,11 @@ func GenerateArticle() Article {
 		article.Content += RenderStockPlate(stockIndustry)
 	}
 	article.Content += RenderPlaceholder()
+	if len(stockComment) > 0 {
+		article.Content += RenderContent(stockComment)
+		article.Content += RenderPlaceholder()
+		article.Content += RenderPlaceholder()
+	}
 	if len(stockMarketIndex) > 0 {
 		article.Content += RenderSubtitle("大盘指数")
 		article.Content += RenderStockTable(stockMarketIndex)
@@ -129,7 +135,7 @@ func GenerateArticle() Article {
 		article.Content += RenderPlaceholder()
 	}
 	if len(stockForeign) > 0 {
-		article.Content += RenderSubtitle("主力净流入/亿")
+		article.Content += RenderSubtitle("主力净流入榜/亿")
 		article.Content += RenderStockTable(stockForeign)
 		article.Content += RenderPlaceholder()
 	}
