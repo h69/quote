@@ -834,3 +834,106 @@ func GetStockChance() []string {
 
 	return contents
 }
+
+// GetStockMarketForeign 获取股票北向资金
+func GetStockMarketForeign() []Stock {
+	var stocks []Stock
+
+	body, err := Get("http://push2.eastmoney.com/api/qt/kamt/get?fields1=f1,f2,f3,f4&fields2=f51,f52,f53,f54,f63")
+	if err != nil {
+		log.Println(err)
+		return stocks
+	}
+
+	log.Println(body)
+
+	type Resp struct {
+		Data struct {
+			Hk2sh struct {
+				DayNetAmtIn float64 `json:"dayNetAmtIn"`
+			} `json:"hk2sh"`
+			Hk2sz struct {
+				DayNetAmtIn float64 `json:"dayNetAmtIn"`
+			} `json:"hk2sz"`
+		} `json:"data"`
+	}
+
+	var resp Resp
+	err = json.Unmarshal([]byte(body), &resp)
+	if err != nil {
+		log.Println(err)
+		return stocks
+	}
+
+	stocks = append(stocks, Stock{
+		Name:               "沪股通",
+		Code:               "",
+		Current:            "",
+		Percent:            "",
+		CurrentYearPercent: "",
+		Value:              GetValueSign(resp.Data.Hk2sh.DayNetAmtIn) + fmt.Sprintf("%.2f", resp.Data.Hk2sh.DayNetAmtIn/10000) + "亿",
+	})
+	stocks = append(stocks, Stock{
+		Name:               "深股通",
+		Code:               "",
+		Current:            "",
+		Percent:            "",
+		CurrentYearPercent: "",
+		Value:              GetValueSign(resp.Data.Hk2sz.DayNetAmtIn) + fmt.Sprintf("%.2f", resp.Data.Hk2sz.DayNetAmtIn/10000) + "亿",
+	})
+
+	log.Println(Sprintf(stocks))
+
+	return stocks
+}
+
+// GetStockForeign 获取股票净流入
+func GetStockForeign() []Stock {
+	var stocks []Stock
+
+	body, err := Get("https://x-quote.cls.cn/web_quote/web_stock/stock_list?app=CailianpressWeb&market=all&os=web&page=1&rever=1&sv=7.5.5&types=last_px,change,tr,main_fund_diff,cmc&way=main_fund_diff&sign=a1017682e6f5e28779457f61d7bee9c3")
+	if err != nil {
+		log.Println(err)
+		return stocks
+	}
+
+	log.Println(body)
+
+	type Resp struct {
+		Data struct {
+			Data []struct {
+				SecuName     string  `json:"secu_name"`
+				SecuCode     string  `json:"secu_code"`
+				LastPx       float64 `json:"last_px"`
+				Change       float64 `json:"change"`
+				MainFundDiff float64 `json:"main_fund_diff"`
+			} `json:"data"`
+		} `json:"data"`
+	}
+
+	var resp Resp
+	err = json.Unmarshal([]byte(body), &resp)
+	if err != nil {
+		log.Println(err)
+		return stocks
+	}
+
+	for _, stock := range resp.Data.Data {
+		if len(stocks) >= 10 {
+			break
+		}
+
+		stocks = append(stocks, Stock{
+			Name:               stock.SecuName,
+			Code:               strings.ToUpper(stock.SecuCode),
+			Current:            fmt.Sprintf("%.2f", stock.LastPx),
+			Percent:            GetPercentSign(stock.Change) + fmt.Sprintf("%.2f", stock.Change*100) + "%",
+			CurrentYearPercent: GetStockCurrentYearPercentByCode(stock.SecuCode),
+			Value:              fmt.Sprintf("%.2f", stock.MainFundDiff/100000000),
+		})
+	}
+
+	log.Println(Sprintf(stocks))
+
+	return stocks
+}

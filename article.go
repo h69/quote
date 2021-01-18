@@ -21,8 +21,9 @@ type Article struct {
 func GenerateArticle() Article {
 	stockCloseTime := GetStockCloseTime()
 	stockMarketOverview := GetStockMarketOverview()
-	stockMarketIndex := GetStockMarketIndex()
+	stockMarketForeign := GetStockMarketForeign()
 	stockIndustry := GetStockIndustry()
+	stockMarketIndex := GetStockMarketIndex()
 	stockFollow := GetStockFollow()
 	stockMao20 := GetStockMao20()
 	stockPercent := GetStockPercent()
@@ -31,6 +32,7 @@ func GenerateArticle() Article {
 	stockMarketCapital := GetStockMarketCapital()
 	stockVolume := GetStockVolume()
 	stockAmount := GetStockAmount()
+	stockForeign := GetStockForeign()
 	stockEvent := GetStockEvent()
 	stockChance := GetStockChance()
 
@@ -73,6 +75,9 @@ func GenerateArticle() Article {
 	if len(stockMarketOverview) > 0 {
 		article.Content += RenderStockChart(stockMarketOverview)
 		article.Content += RenderStockThermometer(stockMarketOverview)
+	}
+	if len(stockMarketForeign) > 0 {
+		article.Content += RenderStockCard(stockMarketForeign)
 	}
 	if len(stockIndustry) > 0 {
 		article.Content += RenderStockPlate(stockIndustry)
@@ -123,9 +128,14 @@ func GenerateArticle() Article {
 		article.Content += RenderStockTable(stockAmount)
 		article.Content += RenderPlaceholder()
 	}
+	if len(stockForeign) > 0 {
+		article.Content += RenderSubtitle("主力净流入/亿")
+		article.Content += RenderStockTable(stockForeign)
+		article.Content += RenderPlaceholder()
+	}
 	if len(stockEvent) > 0 {
 		article.Content += RenderSubtitle("行情回顾")
-		article.Content += RenderStockEvent(stockEvent)
+		article.Content += RenderStockTimeline(stockEvent)
 		article.Content += RenderPlaceholder()
 	}
 	if len(stockChance) > 0 {
@@ -133,7 +143,7 @@ func GenerateArticle() Article {
 		article.Content += RenderContent(stockChance)
 		article.Content += RenderPlaceholder()
 	}
-	article.Content += RenderFooter("涨停三连「分享」「点赞」「在看」👇")
+	article.Content += RenderFooter("牛市三连「分享」「点赞」「在看」👇")
 
 	log.Println(article.Title)
 	log.Println(article.Digest)

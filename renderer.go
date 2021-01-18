@@ -119,8 +119,8 @@ func RenderStockThermometer(bars []Bar) string {
 	return html
 }
 
-// RenderStockEvent 股票事件
-func RenderStockEvent(events []Event) string {
+// RenderStockTimeline 股票时间线
+func RenderStockTimeline(events []Event) string {
 	html := `<table style="width: 100%; padding-right: 16px; padding-left: 16px; border: 0px; line-height: 0;"><tbody>`
 	for i := 0; i < len(events); i++ {
 		html += `<tr style="border: 0px;">`
@@ -163,6 +163,33 @@ func RenderStockPlate(stocks []Stock) string {
 		html += `<td style="width: 33.33%; height: 50px; border: 0px; border-bottom: 0px dashed #ccc; text-align: center; ` + backgroundColor + " " + borderRadius + `"><span style="font-size: 15px; letter-spacing: 0.5px; line-height: 1.25em; color: #fff;">` + stocks[i].Name + `</span><br/><span style="font-size: 12px; letter-spacing: 0.5px; line-height: 1.25em; color: #fff;">` + stocks[i].Percent + `</span></td>`
 
 		if (i+1)%3 == 0 {
+			html += `</tr>`
+		}
+	}
+	html += `</tbody></table>`
+	return html
+}
+
+// RenderStockCard 股票卡片图
+func RenderStockCard(stocks []Stock) string {
+	html := `<table style="width: 100%; padding-right: 2px; padding-left: 2px; border: 0px; line-height: 0; border-collapse: separate; border-spacing: 5px 5px;"><tbody>`
+	for i := 0; i < len(stocks); i++ {
+		var backgroundColor string
+		if strings.Index(stocks[i].Value, "0.00") == 0 {
+			backgroundColor = "background-color: rgb(153, 153, 153);"
+		} else if strings.Contains(stocks[i].Value, "+") {
+			backgroundColor = "background-color: rgb(246, 66, 69);"
+		} else {
+			backgroundColor = "background-color: rgb(0, 171, 59);"
+		}
+
+		if i%2 == 0 {
+			html += `<tr style="border: 0px;">`
+		}
+
+		html += `<td style="width: 50%; height: 50px; border: 0px; border-bottom: 0px dashed #ccc; text-align: center; border-radius: 10px;` + backgroundColor + `"><span style="font-size: 15px; letter-spacing: 0.5px; line-height: 1.25em; color: #fff;">` + stocks[i].Name + `</span><br/><span style="font-size: 12px; letter-spacing: 0.5px; line-height: 1.25em; color: #fff;">` + stocks[i].Value + `</span></td>`
+
+		if (i+1)%2 == 0 {
 			html += `</tr>`
 		}
 	}
