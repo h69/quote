@@ -976,7 +976,7 @@ func GetStockComment() []string {
 	closeTime := GetStockCloseTime()
 
 	for _, data := range resp.Data.RollData {
-		if data.Ctime >= GetTimestamp(closeTime+" 15:00:00") || strings.Contains(data.Title, "收评：") {
+		if data.Ctime >= GetTimestamp(closeTime+" 15:00:00") && strings.Contains(data.Title, "收评：") {
 			title := strings.TrimLeft(data.Title, "收评：")
 			title = "<strong>" + title + "</strong>"
 			content := strings.Replace(data.Content, "【"+data.Title+"】", "", 1)
