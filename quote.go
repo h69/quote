@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"regexp"
 	"strings"
 	"unicode/utf8"
 )
@@ -948,7 +949,7 @@ func GetStockForeign() []Stock {
 func GetStockComment() []string {
 	var contents []string
 
-	body, err := Get("https://www.cls.cn/nodeapi/telegraphList?app=CailianpressWeb&refresh_type=1&rn=50", "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.141 Safari/537.36")
+	body, err := Get("https://www.cls.cn/nodeapi/telegraphList?app=CailianpressWeb&refresh_type=1&rn=100", "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.141 Safari/537.36")
 	if err != nil {
 		log.Println(err)
 		return contents
@@ -979,8 +980,8 @@ func GetStockComment() []string {
 		if data.Ctime >= GetTimestamp(closeTime+" 15:00:00") && strings.Contains(data.Title, "收评：") {
 			title := strings.TrimLeft(data.Title, "收评：")
 			title = "<strong>" + title + "</strong>"
-			content := strings.Replace(data.Content, "【"+data.Title+"】", "", 1)
-			content = strings.TrimLeft(content, "财联社")
+			content := strings.Replace(data.Content, string(regexp.MustCompile("【.+】财联社").Find([]byte(data.Content))), "", 1)
+			content = strings.Replace(content, string(regexp.MustCompile("。截至收盘，.+").Find([]byte(content))), "。", 1)
 			content = string([]rune(content)[Find(content, "，")+1:])
 			contents = append(contents, title)
 			contents = append(contents, content)
