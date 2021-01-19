@@ -26,7 +26,7 @@ func GenerateArticle() Article {
 	stockComment := GetStockComment()
 	stockMarketIndex := GetStockMarketIndex()
 	stockFollow := GetStockFollow()
-	stockMao20 := GetStockMao20()
+	stockPortfolio := GetStockPortfolio()
 	stockPercent := GetStockPercent()
 	stockCurrentYearPercent := GetStockCurrentYearPercent()
 	stockCurrent := GetStockCurrent()
@@ -99,9 +99,9 @@ func GenerateArticle() Article {
 		article.Content += RenderStockTable(stockFollow)
 		article.Content += RenderPlaceholder()
 	}
-	if len(stockMao20) > 0 {
-		article.Content += RenderSubtitle("招财大牛猫茅 20 组合")
-		article.Content += RenderStockTable(stockMao20)
+	for name, stocks := range stockPortfolio {
+		article.Content += RenderSubtitle(name)
+		article.Content += RenderStockTable(stocks)
 		article.Content += RenderPlaceholder()
 	}
 	if len(stockPercent) > 0 {
@@ -145,7 +145,7 @@ func GenerateArticle() Article {
 		article.Content += RenderPlaceholder()
 	}
 	if len(stockChance) > 0 {
-		article.Content += RenderSubtitle("市场机会")
+		article.Content += RenderSubtitle("后市行情")
 		article.Content += RenderContent(stockChance)
 		article.Content += RenderPlaceholder()
 	}

@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"regexp"
 	"strings"
@@ -31,12 +32,6 @@ type Stock struct {
 type Event struct {
 	Content string
 	Time    string
-}
-
-// Content 内容
-type Content struct {
-	Content string
-	Strong  bool
 }
 
 // GetStockCloseTime 获取股票休市时间
@@ -546,66 +541,65 @@ func GetStockFollow() []Stock {
 	return stocks
 }
 
-// GetStockMao20 获取股票茅20组合
-func GetStockMao20() []Stock {
-	var stocks []Stock
+// GetStockPortfolio 获取股票组合
+func GetStockPortfolio() map[string][]Stock {
+	var stocks = make(map[string][]Stock)
 
-	codes := []string{
-		"sh600036",
-		"sz300015",
-		"sz300760",
-		"sz002714",
-		"sh603288",
-		"sz000858",
-		"sz300059",
-		"sh600519",
-		"sh601318",
-		"sh600900",
-		"sh603259",
-		"sz300750",
-		"sh600031",
-		"sh600309",
-		"sh600276",
-		"sz000333",
-		"sh600887",
-		"sz002352",
-		"sz002475",
-		"sh601888",
+	b, err := ioutil.ReadFile("portfolio.json")
+	if err != nil {
+		log.Println(err)
+		return stocks
 	}
 
-	for _, code := range codes {
-		body, err := Get("https://x-quote.cls.cn/quote/stock/basic?secu_code=" + code + "&fields=secu_name,secu_code,last_px,change&app=CailianpressWeb")
-		if err != nil {
-			log.Println(err)
-			return []Stock{}
+	type Portfolio struct {
+		Name   string   `json:"name"`
+		Stocks []string `json:"stocks"`
+	}
+
+	var portfolios []Portfolio
+	err = json.Unmarshal([]byte(b), &portfolios)
+	if err != nil {
+		log.Println(err)
+		return stocks
+	}
+
+	for _, portfolio := range portfolios {
+		for _, stock := range portfolio.Stocks {
+			body, err := Get("https://x-quote.cls.cn/quote/stock/basic?secu_code=" + strings.ToLower(stock) + "&fields=secu_name,secu_code,last_px,change&app=CailianpressWeb")
+			if err != nil {
+				log.Println(err)
+				delete(stocks, portfolio.Name)
+				return stocks
+			}
+
+			log.Println(body)
+
+			type Resp struct {
+				Data struct {
+					SecuName string  `json:"secu_name"`
+					SecuCode string  `json:"secu_code"`
+					LastPx   float64 `json:"last_px"`
+					Change   float64 `json:"change"`
+				} `json:"data"`
+			}
+
+			var resp Resp
+			err = json.Unmarshal([]byte(body), &resp)
+			if err != nil {
+				log.Println(err)
+				delete(stocks, portfolio.Name)
+				return stocks
+			}
+
+			stocks[portfolio.Name] = append(stocks[portfolio.Name], Stock{
+				Name:               resp.Data.SecuName,
+				Code:               strings.ToUpper(resp.Data.SecuCode),
+				Current:            fmt.Sprintf("%.2f", resp.Data.LastPx),
+				Percent:            GetPercentSign(resp.Data.Change) + fmt.Sprintf("%.2f", resp.Data.Change*100) + "%",
+				CurrentYearPercent: GetStockCurrentYearPercentByCode(resp.Data.SecuCode),
+				Value:              "",
+			})
 		}
-
-		log.Println(body)
-
-		type Resp struct {
-			Data struct {
-				SecuName string  `json:"secu_name"`
-				SecuCode string  `json:"secu_code"`
-				LastPx   float64 `json:"last_px"`
-				Change   float64 `json:"change"`
-			} `json:"data"`
-		}
-
-		var resp Resp
-		err = json.Unmarshal([]byte(body), &resp)
-		if err != nil {
-			log.Println(err)
-			return []Stock{}
-		}
-
-		stocks = append(stocks, Stock{
-			Name:               resp.Data.SecuName,
-			Code:               strings.ToUpper(resp.Data.SecuCode),
-			Current:            fmt.Sprintf("%.2f", resp.Data.LastPx),
-			Percent:            GetPercentSign(resp.Data.Change) + fmt.Sprintf("%.2f", resp.Data.Change*100) + "%",
-			CurrentYearPercent: GetStockCurrentYearPercentByCode(resp.Data.SecuCode),
-			Value:              "",
-		})
 	}
 
 	log.Println(Sprintf(stocks))
