@@ -71,7 +71,7 @@ func GenerateArticle() Article {
 	}
 
 	// 内容
-	article.Content += RenderHeader("👆点击关注，领取你的行情精灵")
+	article.Content += RenderHeader("👆点击关注，快人一步")
 	article.Content += RenderPlaceholder()
 	if len(stockMarketOverview) > 0 {
 		article.Content += RenderStockChart(stockMarketOverview)
