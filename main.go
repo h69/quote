@@ -19,7 +19,7 @@ func main() {
 
 	if n == 1 {
 		article := GenerateArticle()
-		AddNews(article.Title, article.Digest, article.Content, article.Cover)
+		Add(article.Title, article.Digest, article.Content, article.Cover)
 	}
 
 	c := cron.New()
@@ -37,7 +37,7 @@ func main() {
 				if stockCloseTime != "" {
 					if stockCloseTime == GetDate(0) {
 						article := GenerateArticle()
-						AddNews(article.Title, article.Digest, article.Content, article.Cover)
+						Add(article.Title, article.Digest, article.Content, article.Cover)
 					}
 					return true
 				}

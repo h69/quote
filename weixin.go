@@ -29,6 +29,64 @@ func GetAccessToken() string {
 	return resp.AccessToken
 }
 
+// Add 添加草稿
+func Add(title string, digest string, content string, thumbMediaID string) string {
+	type Article struct {
+		ThumbMediaID       string `json:"thumb_media_id"`
+		Author             string `json:"author"`
+		Title              string `json:"title"`
+		ContentSourceURL   string `json:"content_source_url"`
+		Content            string `json:"content"`
+		Digest             string `json:"digest"`
+		ShowCoverPic       int    `json:"show_cover_pic"`
+		NeedOpenComment    int    `json:"need_open_comment"`
+		OnlyFansCanComment int    `json:"only_fans_can_comment"`
+	}
+
+	type Req struct {
+		Articles []Article `json:"articles"`
+	}
+
+	// 处理标题长度（64）
+	if len([]rune(title)) > 64 {
+		title = string([]rune(title)[:64])
+	}
+	title = string([]rune(title)[:FindInvert(title, "；")])
+
+	// 处理概要长度（120）
+	if len([]rune(digest)) > 110 {
+		digest = string([]rune(digest)[:110])
+		digest += "..."
+	}
+
+	body, _ := PostJSON("https://api.weixin.qq.com/cgi-bin/draft/add?access_token="+GetAccessToken(), Req{
+		Articles: []Article{
+			{
+				ThumbMediaID:       thumbMediaID,
+				Author:             "",
+				Title:              title,
+				ContentSourceURL:   "",
+				Content:            content,
+				Digest:             digest,
+				ShowCoverPic:       0,
+				NeedOpenComment:    0,
+				OnlyFansCanComment: 0,
+			},
+		},
+	})
+
+	log.Println(body)
+
+	type Resp struct {
+		MediaID string `json:"media_id"`
+	}
+
+	var resp Resp
+	json.Unmarshal([]byte(body), &resp)
+
+	return resp.MediaID
+}
+
 // AddNews 添加图文素材
 func AddNews(title string, digest string, content string, thumbMediaID string) string {
 	type Article struct {
